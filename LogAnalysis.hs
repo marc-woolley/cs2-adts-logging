@@ -32,18 +32,24 @@ parseMessage a = LogMessage (errormessagetypes(untranslatederror)) (read (checkm
 	untranslatederror = (parseMessagehelper a) 
 
 parse :: String -> [LogMessage]
-parse a = map parseMessage (lines a)
+parse a = map (parseMessage) (lines a)
 
-data MessageTree = Leaf
- Node MessageTree LogMessage MessageTree
-
+findtimestamp::LogMessage->Int
+findtimestamp (LogMessage _ time _ ) = time
 insert :: LogMessage -> MessageTree -> MessageTree
-insert a = Node MessageTree a MessageTree
-insert = Leaf Leaf
-
+insert a (Leaf) = Leaf 
+insert a (Node Leaf b Leaf)= Node Leaf a Leaf
+insert a (Node leftbranch b rightbranch) | findtimestamp(a)>findtimestamp(b) =leftbranch
+                                         | findtimestamp(a)<findtimestamp(b) =rightbranch
 
 build :: [LogMessage] -> MessageTree
-build a = map insert a
+build a = foldr insert (Leaf) a
 
---inOrder :: MessageTree -> [LogMessage]
+
+
+inOrder :: MessageTree -> [LogMessage]
+inOrder a@(Leaf) = [] 
+inOrder a@(Node Leaf b Leaf) = [b]
+inOrder a@(Node leftbranch b rightbranch) = inOrder leftbranch
+
 

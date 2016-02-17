@@ -76,7 +76,8 @@ tests = testGroup "unit tests"
     -- Write at least 5 tests for 'insert', with sufficiently
     -- different inputs to test most of the cases.  Look at your code
     -- for 'insert', and any bugs you ran into while writing it.
-
+    , testCase "insert unknown"
+    ( insert LogMessage Warning 6 "the armadillo is processing" )
     -- Next week we'll have the computer write more tests, to help us
     -- be more confident that we've tested all the tricky bits and
     -- edge cases.  There are also tools to make sure that our tests
