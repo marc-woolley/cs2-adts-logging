@@ -77,8 +77,18 @@ tests = testGroup "unit tests"
     -- different inputs to test most of the cases.  Look at your code
     -- for 'insert', and any bugs you ran into while writing it.
     , testCase "insert unknown"
-    ( insert LogMessage Warning 6 "the armadillo is processing" )
-    -- Next week we'll have the computer write more tests, to help us
+    ( insert (Unknown "the armadillo is processing") Leaf 
+      @?= Leaf)
+    
+     , testCase "insert into tree with no elements"
+    ( insert (LogMessage Warning 6 "the armadillo is processing") (Node Leaf (LogMessage Warning 6 "the armadillo is processing Leaf") Leaf)
+    @?= Node Leaf (LogMessage Warning 6 "the armadillo is processing") Leaf)
+
+       , testCase "insert into tree with elements"
+    ( insert (LogMessage Warning 4 "the armadillo is processing") (Node (Node Leaf (LogMessage Warning 6 "the armadillo is processing") Leaf ) (LogMessage Warning 70 "the armadillo is processing Leaf") (Node Leaf (LogMessage Info 4 "the hype is real") Leaf) )
+    @?=  Node (Node Leaf (LogMessage Warning 4 "the armadillo is processing") Leaf) (LogMessage Warning 70 "the armadillo is processing Leaf") (Node Leaf (LogMessage Info 4 "the hype is real") Leaf)) 
+
+    -- Next week we'll have the computer write more tests, to help us         
     -- be more confident that we've tested all the tricky bits and
     -- edge cases.  There are also tools to make sure that our tests
     -- actually run every line of our code (called "coverage"), but we
@@ -89,14 +99,31 @@ tests = testGroup "unit tests"
     -- inputs.  You may want to reuse MessageTrees from the tests on
     -- 'insert' above.  You may even want to move them elsewhere in
     -- the file and give them names, to more easiely reuse them.
+   ,testCase " test tree with many elements"
+   ( inOrder (Node (Node Leaf (LogMessage Warning 4 "the armadillo is processing") Leaf) (LogMessage Warning 70 "the armadillo is processing Leaf") (Node Leaf (LogMessage Info 80 "the hype is real") Leaf))
+    @?= [LogMessage Warning 4 "the armadillo is processing", LogMessage Warning 70 "the armadillo is processing Leaf", LogMessage Info 80 "the hype is real"] )
+
+   ,testCase " test tree with onr element"
+   ( inOrder (Node Leaf (LogMessage Warning 6 "the armadillo is processing Leaf") Leaf)
+    @?= [LogMessage Warning 6 "the armadillo is processing Leaf"])
+
+  ,testCase "test tree with no elements"
+  ( inOrder Leaf
+   @?= [])
 
     , testProperty "build sorted"
-    (\msgList -> isSorted (inOrder (build msgList)))
+    (\msgList ->  (inOrder (build msgList)))
+  isSorted
+  , testProperty "parseMessage test"
+    
+
+, testProperty "build sorted"
+    (doesreadshowwork)
 
     -- show :: Int -> String
     -- gives the String representation of an Int
     -- Use show to test your code to parse Ints
-
+    
     -- Write a function that takes a MessageType, and makes a String
     -- with the same format as the log file:
     -- stringMessageType :: MessageType -> String
@@ -105,6 +132,26 @@ tests = testGroup "unit tests"
     -- Make another function that makes a String from a whole LogMessage
     -- stringLogMessage :: LogMessage -> String
     -- Use it to test parseMessage
+    -- write a function that checks if error message types is true or false
+
+
+
   ]
+
+stringMessageType:: MessageType -> String
+stringMessageType Info = "I" 
+stringMessageType Warning = "W" 
+stringMessageType (Error a) = "E " ++ show a
+
+
+doesreadshowwork :: Int -> Bool
+doesreadshowwork k = k == read (show k)
+
+
+
+stringLogmessageType :: LogMessage -> String
+stringLogmessageType (LogMessage a d c) = unwords([(stringMessageType a) ,(show d), c])
+
+
 
 main = defaultMain tests

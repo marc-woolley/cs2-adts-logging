@@ -37,10 +37,12 @@ parse a = map (parseMessage) (lines a)
 findtimestamp::LogMessage->Int
 findtimestamp (LogMessage _ time _ ) = time
 insert :: LogMessage -> MessageTree -> MessageTree
-insert a (Leaf) = Leaf 
+insert (Unknown _) (Leaf) = Leaf 
+insert (Unknown _) (Node leftbranch b rightbranch) = Node leftbranch b rightbranch
+insert a (Leaf) = Node Leaf a Leaf
 insert a (Node Leaf b Leaf)= Node Leaf a Leaf
-insert a (Node leftbranch b rightbranch) | findtimestamp(a)>findtimestamp(b) =leftbranch
-                                         | findtimestamp(a)<findtimestamp(b) =rightbranch
+insert a (Node leftbranch b rightbranch) | findtimestamp(a)>findtimestamp(b) = Node leftbranch b (insert a rightbranch)
+                                         | findtimestamp(a)<=findtimestamp(b) = Node (insert a leftbranch) b rightbranch
 
 build :: [LogMessage] -> MessageTree
 build a = foldr insert (Leaf) a
@@ -50,6 +52,6 @@ build a = foldr insert (Leaf) a
 inOrder :: MessageTree -> [LogMessage]
 inOrder a@(Leaf) = [] 
 inOrder a@(Node Leaf b Leaf) = [b]
-inOrder a@(Node leftbranch b rightbranch) = inOrder leftbranch
+inOrder a@(Node leftbranch b rightbranch) = inOrder leftbranch ++ [b] ++ inOrder rightbranch
 
 
