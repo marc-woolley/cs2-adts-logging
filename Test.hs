@@ -112,13 +112,9 @@ tests = testGroup "unit tests"
    @?= [])
 
     , testProperty "build sorted"
-    (\msgList ->  (inOrder (build msgList)))
-  isSorted
-  , testProperty "parseMessage test"
-    
-
-, testProperty "build sorted"
-    (doesreadshowwork)
+    (\msgList -> isSorted (inOrder (build msgList)))
+  
+  
 
     -- show :: Int -> String
     -- gives the String representation of an Int
@@ -144,8 +140,8 @@ stringMessageType Warning = "W"
 stringMessageType (Error a) = "E " ++ show a
 
 
-doesreadshowwork :: Int -> Bool
-doesreadshowwork k = k == read (show k)
+ --doesStringMessageTypeWork :: MessageType -> String
+ --doesStringMessageTypeWork a =  == 
 
 
 
